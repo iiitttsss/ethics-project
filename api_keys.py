@@ -1,0 +1,1 @@
+OPENAI_API_KEY = "API_KEY_PLACEHOLDER"  # Replace with your actual API key to use the OpenAI API
