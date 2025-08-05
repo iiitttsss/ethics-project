@@ -28,7 +28,7 @@ Data Collection
 All prompts and their corresponding results are stored in ethics_final_dataset.csv for further analysis.
 
 Statistical Analysis
-Using pandas and matplotlib, we compute z-scores for "yes" probabilities across different demographic groupings to detect outliers or bias patterns. Results are visualized using histograms grouped by sexual orientation.
+Using pandas and matplotlib, we compute the difference in "yes" probabilities from the average (for the same profile) across different demographic groupings to detect outliers or bias patterns. Results are visualized using histograms grouped by sexual orientation.
 
 API
 The API key is not provided for obvius reason. The API key can be added to the file api_keys.py in order to execute the code.
