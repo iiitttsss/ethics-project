@@ -98,7 +98,7 @@ def analyze_probabilities():
     # find all unique combinations of the values for the attributes in attributes_to_group_by
     unique_combinations = df[attributes_to_group_by].drop_duplicates()
 
-    z_scores = {}
+    deltas = {}
 
     for _, unique_combination in unique_combinations.iterrows():
         # filter the dataframe by the unique combination
@@ -110,30 +110,35 @@ def analyze_probabilities():
         # print(f"Analysis for combination: {unique_combination.to_dict()}")
         for key, value in unique_combination.to_dict().items():
             print(f"{key}: {value}")
-        mean_yes_prob = filtered_df["yes probability"].mean()
-        std_yes_prob = filtered_df["yes probability"].std()
+        avg_yes_prob = filtered_df["yes probability"].mean()
         delta_result = {}
         for _, row in filtered_df.iterrows():
-            z_score = (row['yes probability'] - mean_yes_prob) / std_yes_prob if std_yes_prob > 0 else 0
-            print(f"{row[attribute_to_evaluate]}: {z_score:.4f}")
-            delta_result[row[attribute_to_evaluate]] = z_score
-            if row[attribute_to_evaluate] not in z_scores:
-                z_scores[row[attribute_to_evaluate]] = []
-            z_scores[row[attribute_to_evaluate]].append(z_score)
+            delta_from_avg = row['yes probability'] - avg_yes_prob
+
+            print(f"{row[attribute_to_evaluate]}: {delta_from_avg:.4f}")
+            delta_result[row[attribute_to_evaluate]] = delta_from_avg
+            if row[attribute_to_evaluate] not in deltas:
+                deltas[row[attribute_to_evaluate]] = []
+            deltas[row[attribute_to_evaluate]].append(delta_from_avg)
         print()
 
-    # display the z-scores as an histogram
+    # display the deltas from the average yes probability for each sexual orientation
     plt.figure(figsize=(10, 6))
-    for orientation, scores in z_scores.items():
-        plt.hist(scores, bins=30, alpha=0.5, label=orientation)
-        print(f"{orientation} mean z-score: {sum(scores) / len(scores):.4f}")
-    plt.title("Z-Scores Distribution by Sexual Orientation")
-    plt.xlabel("Z-Score")
+    color_map = {
+        "heterosexual": "orange",
+        "straight": "purple",
+        "gay": "yellow",
+        "lesbian": "magenta",
+        "homosexual": "cyan"
+    }
+    for orientation, scores in deltas.items():
+        plt.hist(scores, bins=15, alpha=0.33, label=orientation, color=color_map.get(orientation, "gray"))
+        print(f"{orientation} mean delta from average: {sum(scores) / len(scores):.4f}, std: {pd.Series(scores).std():.4f}")
+    plt.title("Distribution of Delta from Average Yes Probability by Sexual Orientation")
+    plt.xlabel("Delta from Average Yes Probability")
     plt.ylabel("Frequency")
     plt.legend()
     plt.grid(True)
-    # make the x axis by in 0.25 jumps
-    plt.xticks([i * 0.2 for i in range(-8, 8)])
     plt.show()
 
 
